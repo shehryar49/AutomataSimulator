@@ -24,71 +24,39 @@
 class SimulationError extends Error
 {}
 
-function simulate(var sig,var F,var table,var string)
+class DFA
 {
-  var state = 1 # starting state
-  if(string == "") # empty string
-    return F.find(state) == nil
-  foreach(var ch: string)
+  # Symbols
+  var sig = nil
+  # Final State
+  var F = nil
+  # Transition Table
+  var table = nil
+  # Start state
+  var start = nil
+
+  function __construct__(var sig,var F,var table)
   {
-    var idx1 = sig.find(ch)
-    if(idx1 == nil)
-      throw SimulationError("Illegal alphabet '"+ ch + "' used in string!")  
-    state = table[state-1][idx1]  
+    self.sig = sig
+    self.F = F
+    self.table = table
   }
-  return F.find(state) != nil
+  function simulate(var string)
+  {
+    var state = 0 # starting state
+    if(string == "") # empty string
+      return F.find(state) == nil
+    foreach(var ch: string)
+    {
+      var idx1 = sig.find(ch)
+      if(idx1 == nil)
+        throw SimulationError("Illegal alphabet '"+ ch + "' used in string!")  
+      state = table[state][idx1]  
+    }
+    return F.find(state) != nil
+  }
+  function union(var rhs)
+  {
+    
+  }
 }
-function complexExample()
-{
-    # Abstract machine for strings starting and ending with same alphabet
-    var alphabets = ["a","b","c","d"]
-    var finalStates = [2,3,4,5]
-    # Transition table
-    #    \ a  | b  | c  | d 
-    #    -------------------
-    # q1 | q2 | q3 | q4 | q5
-    # q2 | q2 | q6 | q6 | q6
-    # q3 | q7 | q3 | q7 | q7
-    # q4 | q8 | q8 | q4 | q8
-    # q5 | q9 | q9 | q9 | q5
-    # q6 | q2 | q6 | q6 | q6
-    # q7 | q7 | q3 | q7 | q7
-    # q8 | q8 | q8 | q4 | q8 
-    # q9 | q9 | q9 | q9 | q5
-    var transition = [[2,3,4,5],[2,6,6,6],[7,3,7,7],[8,8,4,8],[9,9,9,5],[2,6,6,6],[7,3,7,7],[8,8,4,8],[9,9,9,5]]
-    var good = simulate(alphabets,finalStates,transition,"dcbabcdabcddddd")
-    if(good)
-      println("String is valid")
-    else
-      println("String is invalid")    
-
-}
-
-###########################
-# IMPORTANT: states are numbered from 1
-var alphabets = ["0","1"]
-var finalStates = [2] # q2 is the only final state
-# Transition table
-# each row is for a specific state
-# and each column is for a specific alphabet
-# transition table for strings ending at 0
-#    \ 0  | 1
-#     ---------- 
-# q1 | q2 | q1
-# q2 | q2 | q1
-
-# the simulation algorithm takes a matrix of integers
-# 2 1
-# 2 1
-# in this case
-var transition = [[2,1],[2,1]]
-
-# starting state is always q1
-
-var good = simulate(alphabets,finalStates,transition,"11110100")
-if(good)
-  println("String is valid")
-else
-  println("String is invalid")
-
-#complexExample()
